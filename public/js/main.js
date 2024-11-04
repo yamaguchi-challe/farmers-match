@@ -19,3 +19,36 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+
+// UIの初期化
+var ui = new firebaseui.auth.AuthUI(firebase.auth());
+
+ui.start('#firebaseui-auth-container', {
+  signInFlow: 'popup',
+  signInSuccessUrl: './',
+  signInOptions: [
+    {
+      provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+      requireDisplayName: false
+    }
+  ]
+});
+
+// サインアウト
+function signout() {
+  firebase.auth().signOut()
+    .then(() => {
+      console.log('Signed out')
+    })
+}
+
+// サインイン状態
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    document.getElementById('sign-in-status').innerText = 'Signed in'
+    document.getElementById('sign-out').style.display = 'block'
+  } else {
+    document.getElementById('sign-in-status').innerText = 'Signed out'
+    document.getElementById('sign-out').style.display = 'none'
+  }
+})

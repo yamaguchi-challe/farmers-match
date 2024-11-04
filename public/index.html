@@ -4,9 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Farmers Match</title>
+    <style>
+        .Info {
+            display: flex;
+            justify-content: center;
+            height: 48px;
+            line-height: 48px;
+        }
+
+        .Info button {
+            height: 24px;
+            margin: 12px;
+        }
+    </style>
 </head>
 <body>
     Hello
+    <div class="Info">
+        <div id="sign-in-status">Checking auth-state...</div>
+        <button id="sign-out" onclick="signout()" style="display: none;">sign out</button>
+    </div>
+    <div id="firebaseui-auth-container"></div>
     <script src="js/main.js"></script>
 </body>
 </html>
