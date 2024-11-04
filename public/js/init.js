@@ -9,6 +9,7 @@ import { EmailAuthProvider, getAuth, signOut, onAuthStateChanged, signInWithEmai
 const firebaseConfig = {
   apiKey: "AIzaSyD3aSCovpmTN7N4Tc3olFuhDsh-pcRdUkE",
   authDomain: "farmers-match.firebaseapp.com",
+  databaseURL: "https://farmers-match-default-rtdb.firebaseio.com",
   projectId: "farmers-match",
   storageBucket: "farmers-match.firebasestorage.app",
   messagingSenderId: "353551545898",

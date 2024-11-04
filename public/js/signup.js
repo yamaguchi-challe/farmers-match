@@ -10,14 +10,15 @@ import { getDatabase, ref, push, set, onValue, onChildAdded, remove, onChildRemo
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyD3aSCovpmTN7N4Tc3olFuhDsh-pcRdUkE",
-  authDomain: "farmers-match.firebaseapp.com",
-  projectId: "farmers-match",
-  storageBucket: "farmers-match.firebasestorage.app",
-  messagingSenderId: "353551545898",
-  appId: "1:353551545898:web:74a7e1739018c5304d3553",
-  measurementId: "G-Z8FV5JX0N4"
-};
+    apiKey: "AIzaSyD3aSCovpmTN7N4Tc3olFuhDsh-pcRdUkE",
+    authDomain: "farmers-match.firebaseapp.com",
+    databaseURL: "https://farmers-match-default-rtdb.firebaseio.com",
+    projectId: "farmers-match",
+    storageBucket: "farmers-match.firebasestorage.app",
+    messagingSenderId: "353551545898",
+    appId: "1:353551545898:web:74a7e1739018c5304d3553",
+    measurementId: "G-Z8FV5JX0N4"
+  };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -28,6 +29,14 @@ const db = getDatabase(app);
 $('#submit').on('click', function() {
     let email = $('#email').val();
     let password = $('#password').val();
+    let name = $('#name').val();
+    let postcode = $('#postcode').val();
+    let prefectures = $('#prefectures').val();
+    let municipalities = $('#municipalities').val();
+    let street = $('#street').val();
+    let category = $('#category').val();
+    console.log(email)
+    console.log(password)
     createUserWithEmailAndPassword (auth, email, password)
     .then((userCredential) => {
       // Signed up 
@@ -35,8 +44,20 @@ $('#submit').on('click', function() {
       const uid = user.uid;
       console.log(uid);
       // データベース登録
-      
+      let msg = {
+        uid: uid,
+        email: email,
+        postcode: postcode,
+        prefectures: prefectures,
+        municipalities: municipalities,
+        street: street
+      }
+      let dbRef = ref(db, category+"/"+name+"/info/");
+      console.log(dbRef)
+      set(dbRef, msg);
+      // ホームへ移動
       location.href="home.html";
+    return false;
     })
     .catch((error) => {
       const errorCode = error.code;
