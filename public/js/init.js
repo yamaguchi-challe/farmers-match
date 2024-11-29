@@ -1,6 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-app.js";
 import { EmailAuthProvider, getAuth, signOut, onAuthStateChanged, signInWithEmailAndPassword} from "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js";
+import { getDatabase, ref, get, query, startAt, endAt, push, set, onValue, onChildAdded, remove, onChildRemoved} 
+    from "https://www.gstatic.com/firebasejs/9.13.0/firebase-database.js";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -20,6 +22,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
+const db = getDatabase(app);
 
 $('#submit').on('click', function() {
   let email = $('#email').val();
@@ -29,8 +32,15 @@ $('#submit').on('click', function() {
   .then((userCredential) => {
     // Signed in 
     const user = userCredential.user;
-    // ...
-    location.href="home.html";
+    //marketsの中にuidがあるか確認
+    let dbRef = ref(db, "markets/"+user.uid);
+    onChildAdded(dbRef, function (snapshot) {
+      location.href="market_home.html";
+    });
+    //なければfarmer_homeへ
+    setTimeout(function() {
+      location.href="farmer_home.html";
+    }, 2000);
   })
   .catch((error) => {
     const errorCode = error.code;

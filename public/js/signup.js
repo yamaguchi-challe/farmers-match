@@ -34,6 +34,7 @@ $('#submit').on('click', function() {
     let prefectures = $('#prefectures').val();
     let municipalities = $('#municipalities').val();
     let street = $('#street').val();
+    let crop = $('#crop').val();
     let category = $('#category').val();
     console.log(email)
     console.log(password)
@@ -50,13 +51,22 @@ $('#submit').on('click', function() {
         postcode: postcode,
         prefectures: prefectures,
         municipalities: municipalities,
-        street: street
+        street: street,
+        crop: crop,
+        name: name
       }
-      let dbRef = ref(db, category+"/"+name+"/info/");
+      let dbRef = ref(db, category+"/"+uid+"/info/");
       console.log(dbRef)
       set(dbRef, msg);
       // ホームへ移動
-      location.href="home.html";
+      
+      setTimeout(function() {
+        if(category == "markets"){
+          location.href="market_home.html";
+        }else{
+          location.href="farmer_home.html";
+        }
+      }, 1000);
     return false;
     })
     .catch((error) => {
