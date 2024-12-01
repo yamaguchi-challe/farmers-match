@@ -1,0 +1,8 @@
+.output {
+    background: #f9f9f9;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow-y: scroll;
+    height: 200px; /* 高さを200pxに固定 */
+}

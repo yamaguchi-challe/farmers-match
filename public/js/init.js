@@ -32,6 +32,7 @@ $('#submit').on('click', function() {
   .then((userCredential) => {
     // Signed in 
     const user = userCredential.user;
+    localStorage.setItem("uid", user.uid);
     //marketsの中にuidがあるか確認
     let dbRef = ref(db, "markets/"+user.uid);
     onChildAdded(dbRef, function (snapshot) {

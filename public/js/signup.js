@@ -25,7 +25,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getDatabase(app);
 
-
 $('#submit').on('click', function() {
     let email = $('#email').val();
     let password = $('#password').val();
@@ -44,6 +43,7 @@ $('#submit').on('click', function() {
       const user = userCredential.user;
       const uid = user.uid;
       console.log(uid);
+      localStorage.setItem("uid", uid)
       // データベース登録
       let msg = {
         uid: uid,
