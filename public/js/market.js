@@ -42,7 +42,7 @@ onChildAdded(orderRef, (snapshot) => {
     const data = snapshot.val()
     //自分のオーダーのみ
     if(data.uid == uid){
-        const newCard = createCard(data.crop, data.nowDate)
+        const newCard = createCard(key, data.crop, data.nowDate)
         $("#output").append(newCard)
     }
 });
@@ -72,9 +72,11 @@ $('#submit').on('click', function() {
     return false;
 });
 
-function createCard(title, time){
+function createCard(key, title, time){
     const formatTime = millisecondsToFormattedDate(time)
-    return $('<div class="card">')
+    return $('<a href="details.html?orderid='+ key +'">')
+        .append($('<div class="card">'))
+        .append($('<div class="card-body">'))
         .append($('<h4 class="card-title">').text(title)) // タイトル
         .append($('<div class="time">').text(formatTime)); // 説明
 }
