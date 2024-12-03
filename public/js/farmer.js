@@ -26,15 +26,13 @@ let crop;
 //ナビゲーションバーにユーザ名を表示
 $(document).ready(function(){
     uid = localStorage.getItem('uid')
-    console.log(uid)
     let dbRef = ref(db, "farmers/"+uid);
-
     //ユーザ情報の取得
     onChildAdded(dbRef, function (snapshot) {
         console.log(snapshot.val().name)
         name = snapshot.val().name;
         crop = snapshot.val().crop;
-        $("#nav-name").text(name+"様")
+        $("#nav-name").text(name+" 様")
         $("#order_title").text(crop+"のオーダー一覧")
     });
 
@@ -127,6 +125,7 @@ $("#output").on('submit', 'form', function(event) {
     const price = $(this).find('input[name="price"]').val();
     const time = $(this).find('input[name="time"]').val();
     const key = $(this).find('input[name="orderid"]').val();
+    const nowDate = new Date();
     //データベース登録
     let msg = {
         uid: uid,
@@ -134,6 +133,7 @@ $("#output").on('submit', 'form', function(event) {
         price: price,
         quantity: quantity,
         time: time,
+        nowDate: nowDate.getTime(),
     }
     let newPostKey = push(child(ref(db), 'orders/'+key)).key;
     let dbRef = ref(db, "orders/"+key+"/"+newPostKey);
@@ -142,4 +142,16 @@ $("#output").on('submit', 'form', function(event) {
     $(this).find('input[name="quantity"]').val("");
     $(this).find('input[name="price"]').val("");
     $(this).find('input[name="time"]').val("");
+});
+
+
+// サインアウト
+$('#signout').on('click', function(){
+    signOut(auth).then(() => {
+        // Sign-out successful.
+        localStorage.removeItem('uid');
+        location.href="index.html"
+    }).catch((error) => {
+    // An error happened.
+    });
 });

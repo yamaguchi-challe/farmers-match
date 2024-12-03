@@ -30,7 +30,7 @@ $(document).ready(function(){
     onChildAdded(dbRef, function (snapshot) {
         console.log(snapshot.val().name)
       name = snapshot.val().name;
-      $("#nav-name").text(name+"様")
+      $("#nav-name").text(name+" 様")
     });
 });
 

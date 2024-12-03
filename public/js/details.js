@@ -19,13 +19,57 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getDatabase(app);
+let uid;
+let name;
 
 $(document).ready(function(){
+    uid = localStorage.getItem('uid')
+    let userRef = ref(db, "markets/"+uid);
+    //ユーザ情報の取得
+    onChildAdded(userRef, function (snapshot) {
+        name = snapshot.val().name;
+        $("#nav-name").text(name+" 様")
+    });
+
     const urlParams = new URLSearchParams(window.location.search)
     let id = urlParams.get("orderid")
     console.log(id)
     let dbRef = ref(db, "orders/"+id);
+    let counter = 1
     onChildAdded(dbRef, function (snapshot) {
-        console.log(snapshot.val())
+        const data = snapshot.val()
+        const key = snapshot.key
+        console.log(snapshot.key + ":" + data)
+        if(key == "crop"){
+            //タイトルの表示
+            $("#order_title").text(data+"の出荷が可能な生産者")
+        }else if (key.startsWith('-')) {
+            console.log(data)
+            let farmerName = data.name
+            let farmerUid = data.uid
+            let price = data.price
+            let quantity = data.quantity
+            let time = data.time
+            const newCard = createCard(farmerName, farmerUid, price, quantity, time, counter)
+            $("#output").append(newCard);
+            counter++;
+        }
     });
 });
+
+function createCard(farmerName, farmerUid, price, quantity, time, counter){
+    const formText = `<div class="card">
+                <div class="card-header cursor-pointer">
+                    <h5 class="mb-0">${farmerName} 様</h5>
+                </div>
+                <div class="card-body">
+                    <p>出荷量 ${quantity}kg</p>
+                    <p>単価 ${price}円/kg</p>
+                    <p>出荷目安時刻 ${time}</p>
+                    <p>合計金額 ${quantity*price}円</p>
+                    <button type="submit" class="btn btn-primary">出荷を依頼する</button>
+                </div>
+            </div>`;
+    const card = $(formText);
+    return card
+}
