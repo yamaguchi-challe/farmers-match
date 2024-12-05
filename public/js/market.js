@@ -74,11 +74,19 @@ $('#submit').on('click', function() {
 
 function createCard(key, title, time){
     const formatTime = millisecondsToFormattedDate(time)
-    return $('<a href="details.html?orderid='+ key +'">')
-        .append($('<div class="card">'))
-        .append($('<div class="card-body">'))
-        .append($('<h4 class="card-title">').text(title)) // タイトル
-        .append($('<div class="time">').text(formatTime)); // 説明
+    // return $('<a href="details.html?orderid='+ key +'">')
+    //     .appendChild($('<div class="card card-deco">'))
+    //     .append($('<div class="card-body">'))
+    //     .append($('<h4 class="card-title">').text(title)) // タイトル
+    //     .append($('<div class="time">').text(formatTime)); // 説明
+    const formText = `<a href="details.html?orderid=${key}">
+        <div class="card">
+            <h4 class="card-title">${title}
+        </div>
+    </a>`;
+    // <div class="time">${formatTime}</div>
+    const card = $(formText);
+    return card
 }
 
 function millisecondsToFormattedDate(milliseconds) {

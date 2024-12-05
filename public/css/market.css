@@ -6,3 +6,15 @@
     overflow-y: scroll;
     height: 200px; /* 高さを200pxに固定 */
 }
+
+.card-deco {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.card-title{
+    text-decoration: none;
+}
