@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-app.js";
 import { EmailAuthProvider, getAuth, signOut, onAuthStateChanged, createUserWithEmailAndPassword } 
     from "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js";
-import { getDatabase, ref, query, push, set, child, onValue, onChildAdded, remove, onChildRemoved, onChildChanged, orderByChild, equalTo, startAt} 
+import { getDatabase, ref, query, push, set, update, child, onValue, onChildAdded, remove, onChildRemoved, onChildChanged, orderByChild, equalTo, startAt} 
     from "https://www.gstatic.com/firebasejs/9.13.0/firebase-database.js";
 
 const firebaseConfig = {
@@ -50,26 +50,79 @@ $(document).ready(function(){
             let price = data.price
             let quantity = data.quantity
             let time = data.time
-            const newCard = createCard(farmerName, farmerUid, price, quantity, time, counter)
-            $("#output").append(newCard);
+            let status = data.status
+            if(status == "requested"){
+                let newCard = createRequestedCard(id, key, farmerName, farmerUid, price, quantity, time, counter)
+                $("#output").append(newCard);
+            } else {
+                let newCard = createCard(id, key, farmerName, farmerUid, price, quantity, time, counter)
+                $("#output").append(newCard);
+            }
             counter++;
         }
     });
 });
 
-function createCard(farmerName, farmerUid, price, quantity, time, counter){
+function createCard(id, key, farmerName, farmerUid, price, quantity, time, counter){
     const formText = `<div class="card">
                 <div class="card-header cursor-pointer">
                     <h5 class="mb-0">${farmerName} 様</h5>
                 </div>
                 <div class="card-body">
-                    <p>出荷量 ${quantity}kg</p>
-                    <p>単価 ${price}円/kg</p>
-                    <p>出荷目安時刻 ${time}</p>
-                    <p>合計金額 ${quantity*price}円</p>
-                    <button type="submit" class="btn btn-primary">出荷を依頼する</button>
+                    <form>
+                        <p>出荷量 ${quantity}kg</p>
+                        <p>単価 ${price}円/kg</p>
+                        <p>出荷目安時刻 ${time}</p>
+                        <p>合計金額 ${quantity*price}円</p>
+                        <input type="hidden" class="form-control" id="id" name="id" value=${id}>
+                        <input type="hidden" class="form-control" id="key" name="key" value=${key}>
+                        <input type="hidden" class="form-control" id="farmerUid" name="farmerUid" value=${farmerUid}>
+                        <button type="submit" class="btn btn-primary">出荷を依頼する</button>
+                    </form>
                 </div>
             </div>`;
     const card = $(formText);
     return card
 }
+
+function createRequestedCard(id, key, farmerName, farmerUid, price, quantity, time, counter){
+    const formText = `<div class="card">
+                <div class="card-header cursor-pointer">
+                    <h5 class="mb-0">${farmerName} 様</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <p>出荷量 ${quantity}kg</p>
+                        <p>単価 ${price}円/kg</p>
+                        <p>出荷目安時刻 ${time}</p>
+                        <p>合計金額 ${quantity*price}円</p>
+                        <input type="hidden" class="form-control" id="id" name="id" value=${id}>
+                        <input type="hidden" class="form-control" id="key" name="key" value=${key}>
+                        <input type="hidden" class="form-control" id="farmerUid" name="farmerUid" value=${farmerUid}>
+                        <button type="submit" class="btn btn-secondary" disabled>依頼済み</button>
+                    </form>
+                </div>
+            </div>`;
+    const card = $(formText);
+    return card
+}
+
+$("#output").on('submit', 'form', function(event) {
+    event.preventDefault();  // フォームのデフォルト送信を防止
+    // 入力内容を取得
+    const id = $(this).find('input[name="id"]').val();
+    const farmerUid = $(this).find('input[name="farmerUid"]').val();
+    const key = $(this).find('input[name="key"]').val();
+    //データベース登録
+    let msg = {
+        status: "requested",
+    }
+    let dbRef = ref(db, "orders/"+id+"/"+key);
+    update(dbRef, msg);
+    console.log($(this).find('button')[0].disabled)
+    $(this).find('button')[0].disabled = true;
+    $(this).find('button')[0].classList.remove('btn-primary');
+    $(this).find('button')[0].classList.add('btn-secondary');
+    $(this).find('button')[0].textContent = "依頼済み"
+    alert("出荷を依頼しました");
+});
