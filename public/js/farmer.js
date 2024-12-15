@@ -22,9 +22,11 @@ const db = getDatabase(app);
 let uid;
 let name;
 let crop;
+let taskCounter = 1;
+let orderCounter = 1;
 
 //ナビゲーションバーにユーザ名を表示
-$(document).ready(function(){
+$(document).ready(async function(){
     uid = localStorage.getItem('uid')
     let dbRef = ref(db, "farmers/"+uid);
     //ユーザ情報の取得
@@ -35,10 +37,9 @@ $(document).ready(function(){
         $("#nav-name").text(name+" 様")
         $("#order_title").text(crop+"のオーダー一覧")
     });
-
+    
     //オーダー一覧の取得
     let orderRef = query(ref(db, 'orders'));
-    let counter = 1
     onChildAdded(orderRef, function (snapshot) {
         const key = snapshot.key
         const data = snapshot.val()
@@ -52,17 +53,20 @@ $(document).ready(function(){
                 let dbRef = ref(db, "orders/"+key);
                 remove(dbRef)
             }else if(data[uid] == undefined){
-                const newCard = createCard(key, data.name, data.nowDate, counter);
+                const newCard = createCard(key, data.name, data.nowDate, orderCounter);
                 $("#output").append(newCard);
+                $("#nooutput").hide();
+                orderCounter++;
             }else{
                 const registData = data[uid]
                 console.log(registData)
                 if(registData.status == "requested"){
                     const newTaskCard = createTaskCard(key, uid, data.name, data.marketUid, registData.quantity, registData.time)
                     $("#task").append(newTaskCard);
+                    $("#notask").hide();
+                    taskCounter++
                 }
             }
-            counter++;
         }
     });
 });

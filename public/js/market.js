@@ -42,16 +42,16 @@ onChildAdded(orderRef, (snapshot) => {
     //自分のオーダーのみ
     if(data.uid == uid){
         const today = new Date();
-        console.log("現在時刻:"+today)
-        console.log("締切時刻:"+data.time)
         if(today.getTime() >= data.time){
             //締め切りが過ぎているオーダーを削除
             let dbRef = ref(db, "orders/"+key);
             remove(dbRef)
         }else{
             //カードの表示
-            const newCard = createCard(key, data.crop, data.time, Object.keys(data).length-6)
-            $("#output").append(newCard)
+            const newCard = createCard(key, data.crop, data.time, Object.keys(data).length-6);
+            $("#output").append(newCard);
+            $("#output").removeClass("d-none");
+            $("#nooutput").hide();
         }
     }
 });
@@ -78,9 +78,11 @@ $('#submit').on('click', function() {
     set(dbRef, msg);
     alert("オーダーを登録しました。");
     //フォームの初期化
-    $('#crop').val("")
-    $('#quantity').val("")
-    $('#time').val("")
+    $('#crop').val("");
+    $('#quantity').val("");
+    $('#time').val("");
+    $("#output").removeClass("d-none");
+    $("#nooutput").hide();
     return false;
 });
 

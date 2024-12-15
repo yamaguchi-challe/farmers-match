@@ -21,6 +21,7 @@ const auth = getAuth();
 const db = getDatabase(app);
 let uid;
 let name;
+let id;
 
 $(document).ready(function(){
     uid = localStorage.getItem('uid')
@@ -32,7 +33,7 @@ $(document).ready(function(){
     });
 
     const urlParams = new URLSearchParams(window.location.search)
-    let id = urlParams.get("orderid")
+    id = urlParams.get("orderid")
     console.log(id)
     let dbRef = ref(db, "orders/"+id);
     let counter = 1
@@ -126,6 +127,12 @@ $("#output").on('submit', 'form', function(event) {
     $(this).find('button')[0].textContent = "依頼済み"
     alert("出荷を依頼しました");
 });
+
+$("#end").on("click", function(){
+    let dbRef = ref(db, "orders/"+id);
+    remove(dbRef);
+    window.history.back();
+})
 
 function millisecondsToFormattedDate(milliseconds) {
     const date = new Date(milliseconds);
