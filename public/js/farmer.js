@@ -46,8 +46,12 @@ $(document).ready(function(){
         if(data.crop == crop){
             let regist = false;
             //未応募
-            if(data[uid] == undefined){
-                console.log("aaa")
+            const today = new Date();
+            if(today.getTime() >= data.time){
+                //締め切りが過ぎているオーダーを削除
+                let dbRef = ref(db, "orders/"+key);
+                remove(dbRef)
+            }else if(data[uid] == undefined){
                 const newCard = createCard(key, data.name, data.nowDate, counter);
                 $("#output").append(newCard);
             }else{

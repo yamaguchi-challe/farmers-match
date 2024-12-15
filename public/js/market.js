@@ -35,15 +35,24 @@ $(document).ready(function(){
 });
 
 //オーダー一覧の表示
-// let orderRef = query(ref(db, 'orders'), orderByChild("uid"), equalTo(""));
 let orderRef = query(ref(db, 'orders'), orderByChild("time"));
 onChildAdded(orderRef, (snapshot) => {
     const key = snapshot.key
     const data = snapshot.val()
     //自分のオーダーのみ
     if(data.uid == uid){
-        const newCard = createCard(key, data.crop, data.nowDate)
-        $("#output").append(newCard)
+        const today = new Date();
+        console.log("現在時刻:"+today)
+        console.log("締切時刻:"+data.time)
+        if(today.getTime() >= data.time){
+            //締め切りが過ぎているオーダーを削除
+            let dbRef = ref(db, "orders/"+key);
+            remove(dbRef)
+        }else{
+            //カードの表示
+            const newCard = createCard(key, data.crop, data.time, Object.keys(data).length-6)
+            $("#output").append(newCard)
+        }
     }
 });
 
@@ -51,13 +60,16 @@ $('#submit').on('click', function() {
     let crop = $('#crop').val();
     let quantity = $('#quantity').val();
     let time = $('#time').val();
+    const today = new Date();
+    let milliseconds = today.getTime();
+    milliseconds = milliseconds + (time * 60 * 60 * 1000);
     let nowDate = new Date();
     //データベース登録
     let msg = {
         uid: uid,
         crop: crop,
         quantity: quantity,
-        time: time,
+        time: milliseconds,
         nowDate: nowDate.getTime(),
         name: name
     }
@@ -72,11 +84,13 @@ $('#submit').on('click', function() {
     return false;
 });
 
-function createCard(key, title, time){
+function createCard(key, title, time, count){
     const formatTime = millisecondsToFormattedDate(time)
-    const formText = `<a href="details.html?orderid=${key}">
+    const formText = `<a href="details.html?orderid=${key}" class="text-decoration-none">
         <div class="card">
-            <h4 class="card-title">${title}
+            <h4 class="card-title">${title}</h4>
+            <p>応募件数：${count}件</p>
+            <p>掲載締め切り時間：${formatTime}</p>
         </div>
     </a>`;
     const card = $(formText);
