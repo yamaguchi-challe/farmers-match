@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-app.js";
 import { EmailAuthProvider, getAuth, signOut, onAuthStateChanged, createUserWithEmailAndPassword } 
     from "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js";
-import { getDatabase, ref, query, push, set, child, onValue, onChildAdded, remove, onChildRemoved, onChildChanged, orderByChild, equalTo, startAt} 
+import { getDatabase, ref, query, push, set, update, child, onValue, onChildAdded, remove, onChildRemoved, onChildChanged, orderByChild, equalTo, startAt} 
     from "https://www.gstatic.com/firebasejs/9.13.0/firebase-database.js";
 
 const firebaseConfig = {
@@ -44,12 +44,43 @@ $(document).ready(function(){
         const data = snapshot.val()
         //自分の登録した作物のみ
         if(data.crop == crop){
-            const newCard = createCard(key, data.name, data.nowDate, counter);
-            $("#output").append(newCard);
+            let regist = false;
+            //未応募
+            if(data[uid] == undefined){
+                console.log("aaa")
+                const newCard = createCard(key, data.name, data.nowDate, counter);
+                $("#output").append(newCard);
+            }else{
+                const registData = data[uid]
+                console.log(registData)
+                if(registData.status == "requested"){
+                    const newTaskCard = createTaskCard(key, uid, data.name, data.marketUid, registData.quantity, registData.time)
+                    $("#task").append(newTaskCard);
+                }
+            }
             counter++;
         }
     });
 });
+
+function createTaskCard(id, key, name, marketUid, quantity, time){
+    const formText = `<div class="card">
+                <div class="card-header cursor-pointer">
+                    <h5 class="mb-0">${name} への出荷</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <p>出荷量 ${quantity}kg</p>
+                        <p>出荷目標時刻 ${millisecondsToFormattedDate(time)}</p>
+                        <input type="hidden" class="form-control" id="id" name="id" value=${id}>
+                        <input type="hidden" class="form-control" id="key" name="key" value=${key}>
+                        <button type="submit" class="btn btn-primary">出荷完了</button>
+                    </form>
+                </div>
+            </div>`;
+    const card = $(formText);
+    return card
+}
 
 function createCard(key, title, time, counter){
     const formatTime = millisecondsToFormattedDate(time)
@@ -124,6 +155,10 @@ $("#output").on('submit', 'form', function(event) {
     const quantity = $(this).find('input[name="quantity"]').val();
     const price = $(this).find('input[name="price"]').val();
     const time = $(this).find('input[name="time"]').val();
+    const [hours, minutes] = time.split(':').map(Number);
+    const today = new Date();
+    today.setHours(hours, minutes, 0, 0);
+    const milliseconds = today.getTime();
     const key = $(this).find('input[name="orderid"]').val();
     const nowDate = new Date();
     //データベース登録
@@ -132,16 +167,30 @@ $("#output").on('submit', 'form', function(event) {
         name: name,
         price: price,
         quantity: quantity,
-        time: time,
+        time: milliseconds,
         nowDate: nowDate.getTime(),
     }
-    let newPostKey = push(child(ref(db), 'orders/'+key)).key;
-    let dbRef = ref(db, "orders/"+key+"/"+newPostKey);
+    let dbRef = ref(db, "orders/"+key+"/"+uid);
     set(dbRef, msg);
     alert("オーダーを登録しました。");
     $(this).find('input[name="quantity"]').val("");
     $(this).find('input[name="price"]').val("");
     $(this).find('input[name="time"]').val("");
+});
+
+$("#task").on('submit', 'form', function(event) {
+    event.preventDefault();  // フォームのデフォルト送信を防止
+    // 入力内容を取得
+    const id = $(this).find('input[name="id"]').val();
+    const key = $(this).find('input[name="key"]').val();
+    //データベース登録
+    let msg = {
+        status: "complete",
+    }
+    let dbRef = ref(db, "orders/"+id+"/"+key);
+    update(dbRef, msg);
+    alert("出荷ありがとうございました");
+    window.location.reload();
 });
 
 

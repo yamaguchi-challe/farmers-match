@@ -43,7 +43,7 @@ $(document).ready(function(){
         if(key == "crop"){
             //タイトルの表示
             $("#order_title").text(data+"の出荷が可能な生産者")
-        }else if (key.startsWith('-')) {
+        }else if (data == "[object Object]") {
             console.log(data)
             let farmerName = data.name
             let farmerUid = data.uid
@@ -72,7 +72,7 @@ function createCard(id, key, farmerName, farmerUid, price, quantity, time, count
                     <form>
                         <p>出荷量 ${quantity}kg</p>
                         <p>単価 ${price}円/kg</p>
-                        <p>出荷目安時刻 ${time}</p>
+                        <p>出荷目安時刻 ${millisecondsToFormattedDate(time)}</p>
                         <p>合計金額 ${quantity*price}円</p>
                         <input type="hidden" class="form-control" id="id" name="id" value=${id}>
                         <input type="hidden" class="form-control" id="key" name="key" value=${key}>
@@ -126,3 +126,14 @@ $("#output").on('submit', 'form', function(event) {
     $(this).find('button')[0].textContent = "依頼済み"
     alert("出荷を依頼しました");
 });
+
+function millisecondsToFormattedDate(milliseconds) {
+    const date = new Date(milliseconds);
+
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // ゼロ埋め
+    const day = String(date.getDate()).padStart(2, '0'); // ゼロ埋め
+    const hours = String(date.getHours()).padStart(2, '0'); // ゼロ埋め
+    const minutes = String(date.getMinutes()).padStart(2, '0'); // ゼロ埋め
+
+    return `${month}月${day}日 ${hours}時${minutes}分`;
+}
